@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const ImageDecoder = () => {
   const [image, setImage] = useState(null);
@@ -27,29 +28,34 @@ const ImageDecoder = () => {
     }
   };
 
+
+
   const handleUpload = async () => {
     if (!image) {
       alert("Please select an image before uploading.");
       return;
     }
-
+  
     const formData = new FormData();
-    formData.append("file", image.file); 
-
-
+    formData.append("file", image.file);
+  
     try {
       setUploadStatus("Uploading...");
-
-      const response = await fetch("http://127.0.0.1:8000/image-scan/", {
-        method: "POST",
-        body: formData,
+  
+      const response = await axios.post("http://127.0.0.1:8000/image-scan/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      
-
-      if (response.ok) {
+  
+      console.log(response);
+  
+      if (response.status === 200) {
         setUploadStatus("Upload successful!");
-        // setOimage(response.image)
-        Setcount(count)
+        // Assuming the response contains an updated image or detection count:
+        // setOimage(response.data.image);
+        // Setcount(response.data.count);
+        Setcount(count); // Your logic remains here
       } else {
         setUploadStatus("Upload failed.");
       }
@@ -58,6 +64,7 @@ const ImageDecoder = () => {
       setUploadStatus("An error occurred while uploading.");
     }
   };
+  
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
