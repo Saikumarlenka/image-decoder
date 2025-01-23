@@ -2,60 +2,54 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const ImageDecoder = () => {
-  const [image, setImage] = useState(null);
-  const [oimage,setOimage] = useState(null);
-  const [count,Setcount]=useState(null)
+  const [imageFile, setImageFile] = useState(null); // State to hold the actual file
+  const [preview, setPreview] = useState(null); // State for preview URL
   const [uploadStatus, setUploadStatus] = useState("");
+  const [count, setCount] = useState(null); // Example API response data
+  const [oimage, setOimage] = useState(null); // Example of processed image response
 
+  // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0]; // Get the selected file
-
     if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        setImage({ file, preview: reader.result, name: file.name });
-      };
-
-      reader.onerror = () => {
-        alert("There was an error reading the file.");
-      };
-
-      reader.readAsDataURL(file); // Generate a preview for the image
+      setImageFile(file); // Set the selected file in state
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl); // Set the preview URL
     } else {
       alert("Please select a valid image file.");
-      setImage(null);
+      setImageFile(null);
+      setPreview(null);
     }
   };
 
-
-
+  // Handle image upload
   const handleUpload = async () => {
-    if (!image) {
+    if (!imageFile) {
       alert("Please select an image before uploading.");
       return;
     }
-  
+
+    // Prepare FormData
     const formData = new FormData();
-    formData.append("file", image.file);
-  
+    formData.append("file", imageFile);
+ 
+    
     try {
       setUploadStatus("Uploading...");
-  
+
+      // Upload via Axios
       const response = await axios.post("http://127.0.0.1:8000/image-scan/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
+
       console.log(response);
-  
+
       if (response.status === 200) {
         setUploadStatus("Upload successful!");
-        // Assuming the response contains an updated image or detection count:
-        // setOimage(response.data.image);
-        // Setcount(response.data.count);
-        Setcount(count); // Your logic remains here
+        setCount(response.data.count); // Assume 'count' is part of the API response
+        setOimage(response.data.image); // Assume 'image' is part of the API response
       } else {
         setUploadStatus("Upload failed.");
       }
@@ -64,26 +58,21 @@ const ImageDecoder = () => {
       setUploadStatus("An error occurred while uploading.");
     }
   };
-  
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <label htmlFor="imagePicker" style={{ display: "block", marginBottom: "10px" }}>
         Select an Image:
       </label>
-      <input
-        type="file"
-        id="imagePicker"
-        accept="image/*"
-        onChange={handleFileChange}
-      />
+      <input type="file" id="imagePicker" accept="image/*" onChange={handleFileChange} />
+
       <div style={{ marginTop: "20px" }}>
-        {image ? (
+        {preview ? (
           <div style={{ textAlign: "center" }}>
             <h3>Preview:</h3>
             <img
-              src={image.preview}
-              alt={image.name}
+              src={preview}
+              alt="Selected Preview"
               style={{
                 maxWidth: "300px",
                 maxHeight: "300px",
@@ -92,14 +81,12 @@ const ImageDecoder = () => {
                 boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
               }}
             />
-            <p style={{ fontSize: "14px", marginTop: "10px", wordBreak: "break-word" }}>
-              {image.name}
-            </p>
           </div>
         ) : (
           <p>No image selected</p>
         )}
       </div>
+
       <button
         onClick={handleUpload}
         style={{
@@ -114,32 +101,34 @@ const ImageDecoder = () => {
       >
         Upload Image
       </button>
+
       {uploadStatus && (
         <p style={{ marginTop: "20px", color: uploadStatus === "Upload successful!" ? "green" : "red" }}>
           {uploadStatus}
         </p>
       )}
-      <div>
-  {oimage !== null && (
-    <img
-      src={oimage}
-      alt="Selected"
-      style={{
-        maxWidth: "100%",
-        maxHeight: "300px",
-        borderRadius: "8px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      }}
-    />
-  )}
-</div>
-<div>{
-    count && (
-        <h2>Count:{count}</h2>
-    )
-    }
-</div>
 
+      {oimage && (
+        <div>
+          <h3>Processed Image:</h3>
+          <img
+            src={oimage}
+            alt="Processed"
+            style={{
+              maxWidth: "100%",
+              maxHeight: "300px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+          />
+        </div>
+      )}
+
+      {count !== null && (
+        <div>
+          <h2>Detection Count: {count}</h2>
+        </div>
+      )}
     </div>
   );
 };
