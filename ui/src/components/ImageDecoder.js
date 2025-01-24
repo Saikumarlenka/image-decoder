@@ -2,59 +2,68 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const ImageDecoder = () => {
-  const [imageFile, setImageFile] = useState(null); // State to hold the actual file
-  const [preview, setPreview] = useState(null); // State for preview URL
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
-  const [count, setCount] = useState(null); // Example API response data
-  const [oimage, setOimage] = useState(null); // Example of processed image response
+  const [count, setCount] = useState(null);
+  const [oimage, setOimage] = useState(null);
+  const [imageType, setImageType] = useState("");
+  const [error, setError] = useState("");
 
-  // Handle file selection
+  const imageTypes = ["wood", "box"];
+
   const handleFileChange = (event) => {
-    const file = event.target.files[0]; // Get the selected file
+    const file = event.target.files[0];
     if (file && file.type.startsWith("image/")) {
-      setImageFile(file); // Set the selected file in state
+      setImageFile(file);
       const previewUrl = URL.createObjectURL(file);
-      setPreview(previewUrl); // Set the preview URL
+      setPreview(previewUrl);
+      setError("");
     } else {
-      alert("Please select a valid image file.");
+      setError("Please select a valid image file.");
       setImageFile(null);
       setPreview(null);
     }
   };
 
-  // Handle image upload
+  const handleTypeChange = (event) => {
+    setImageType(event.target.value);
+    setError("");
+  };
+
   const handleUpload = async () => {
     if (!imageFile) {
-      alert("Please select an image before uploading.");
+      setError("Image is required.");
       return;
     }
 
-    // Prepare FormData
+    if (!imageType) {
+      setError("Image type is required.");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("file", imageFile);
- 
-    
+    formData.append("image", imageFile);
+    formData.append("type", imageType);
+
     try {
       setUploadStatus("Uploading...");
+      setError("");
 
-      // Upload via Axios
       const response = await axios.post("http://127.0.0.1:8000/image-scan/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log(response);
-
       if (response.status === 200) {
         setUploadStatus("Upload successful!");
-        setCount(response.data.count); // Assume 'count' is part of the API response
-        setOimage(response.data.image); // Assume 'image' is part of the API response
+        setCount(response.data.count);
+        setOimage(response.data.image_path);
       } else {
         setUploadStatus("Upload failed.");
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
       setUploadStatus("An error occurred while uploading.");
     }
   };
@@ -87,6 +96,30 @@ const ImageDecoder = () => {
         )}
       </div>
 
+      <label htmlFor="imageType" style={{ display: "block", marginTop: "20px" }}>
+        Select Image Type:
+      </label>
+      <select
+        id="imageType"
+        value={imageType}
+        onChange={handleTypeChange}
+        style={{
+          marginTop: "10px",
+          padding: "10px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          width: "100%",
+          maxWidth: "300px",
+        }}
+      >
+        <option value="">--Select Type--</option>
+        {imageTypes.map((type) => (
+          <option key={type} value={type}>
+            {type.charAt(0).toUpperCase()+type.slice(1)}
+          </option>
+        ))}
+      </select>
+
       <button
         onClick={handleUpload}
         style={{
@@ -101,6 +134,8 @@ const ImageDecoder = () => {
       >
         Upload Image
       </button>
+
+      {error && <p style={{ marginTop: "20px", color: "red" }}>{error}</p>}
 
       {uploadStatus && (
         <p style={{ marginTop: "20px", color: uploadStatus === "Upload successful!" ? "green" : "red" }}>
