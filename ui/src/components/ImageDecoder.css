@@ -1,0 +1,136 @@
+.container {
+    padding: 2rem;
+    
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .wrapper {
+    width: 100%;
+    max-width: 28rem;
+    border: 2px solid gray;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  /* Optional: Add hover effect */
+  .wrapper:hover {
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25), 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .custom-upload-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .custom-upload-button:hover {
+    background-color: #45a049;
+  }
+  
+  .input-file {
+    display: none;
+  }
+  
+  .select-type-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .select-type {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+  }
+  
+  .space-buttons {
+    display: space-around;
+    margin-top: 1rem;
+  }
+  
+  .capture-button,
+  .upload-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #34d399;
+    color: white;
+    border-radius: 0.375rem;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .capture-button {
+    background-color: #3b82f6;
+  }
+  
+  .input-file {
+    width: 100%;
+    padding: 1rem;
+    background-color: #10b981;
+    color: white;
+    border-radius: 0.375rem;
+    cursor: pointer;
+  }
+  
+  .preview-section {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .preview-image {
+    max-width: 100%;
+    max-height: 15rem;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .error-message {
+    color: #f87171;
+    margin-top: 1rem;
+  }
+  
+  .status-message {
+    margin-top: 1rem;
+  }
+  
+  .status-success {
+    color: #10b981;
+  }
+  
+  .status-fail {
+    color: #f87171;
+  }
+  
+  .processed-section {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .processed-image {
+    max-width: 100%;
+    max-height: 15rem;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .detection-count {
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  

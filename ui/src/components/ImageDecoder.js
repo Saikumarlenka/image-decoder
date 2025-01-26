@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
+import "./ImageDecoder.css"; // Import the CSS file
 
 const ImageDecoder = () => {
   const [imageFile, setImageFile] = useState(null);
@@ -9,6 +10,9 @@ const ImageDecoder = () => {
   const [oimage, setOimage] = useState(null);
   const [imageType, setImageType] = useState("");
   const [error, setError] = useState("");
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [videoStream, setVideoStream] = useState(null);
+  const canvasRef = useRef(null);
 
   const imageTypes = ["wood", "box"];
 
@@ -19,6 +23,7 @@ const ImageDecoder = () => {
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
       setError("");
+      stopCamera(); // Stop the camera if a file is selected
     } else {
       setError("Please select a valid image file.");
       setImageFile(null);
@@ -68,102 +73,150 @@ const ImageDecoder = () => {
     }
   };
 
-  return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <label htmlFor="imagePicker" style={{ display: "block", marginBottom: "10px" }}>
-        Select an Image:
-      </label>
-      <input type="file" id="imagePicker" accept="image/*" onChange={handleFileChange} />
+  const startCamera = async () => {
+    try {
+      // Clear previous camera container
+      const cameraContainer = document.getElementById("cameraContainer");
+      cameraContainer.innerHTML = "";
 
-      <div style={{ marginTop: "20px" }}>
-        {preview ? (
-          <div style={{ textAlign: "center" }}>
+      // Start a new video stream
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setVideoStream(stream);
+      const videoElement = document.createElement("video");
+      videoElement.srcObject = stream;
+      videoElement.play();
+      videoElement.width = window.innerWidth > 640 ? 640 : window.innerWidth * 0.9; // 90% of the screen width
+      videoElement.height = videoElement.width * (480 / 640); // Maintain the 4:3 aspect ratio
+      videoElement.id = "videoElement";
+      setIsCameraActive(true);
+
+      // Append video element to the DOM
+      cameraContainer.appendChild(videoElement);
+    } catch (err) {
+      setError("Failed to access the camera.");
+    }
+  };
+
+  const captureImage = () => {
+    if (canvasRef.current && videoStream) {
+      const videoElement = document.getElementById("videoElement");
+      const canvas = canvasRef.current;
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      const imageUrl = canvas.toDataURL("image/png");
+
+      // Create a File from the canvas image data URL
+      fetch(imageUrl)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "captured_image.png", { type: "image/png" });
+          setImageFile(file);
+          setPreview(imageUrl);
+          stopCamera(); // Stop the camera after capturing
+        })
+        .catch(() => setError("Error capturing image."));
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoStream) {
+      videoStream.getTracks().forEach((track) => track.stop());
+      setVideoStream(null);
+      setIsCameraActive(false);
+
+      const cameraContainer = document.getElementById("cameraContainer");
+      cameraContainer.innerHTML = ""; // Clear the camera container
+    }
+  };
+
+  const handleCapture = () => {
+    if (!isCameraActive) {
+      startCamera();
+    } else {
+      captureImage();
+    }
+  };
+
+  return (
+    <div className="container">
+      <div className="wrapper">
+        <label htmlFor="imageType" className="select-type-label">
+          Select Image Type:
+        </label>
+        <select
+          id="imageType"
+          value={imageType}
+          onChange={handleTypeChange}
+          className="select-type"
+        >
+          <option value="">--Select Type--</option>
+          {imageTypes.map((type) => (
+            <option key={type} value={type}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </option>
+          ))}
+        </select>
+
+        <div className="space-buttons">
+          <button onClick={handleCapture} className="capture-button">
+            {isCameraActive ? "Capture Image" : "Use Camera to Capture Image"}
+          </button>
+          <p>or</p>
+          <label htmlFor="fileInput" className="custom-upload-button">
+            Upload from Device
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="input-file"
+            style={{ display: "none" }}
+          />
+        </div>
+
+        {preview && (
+          <div className="preview-section">
             <h3>Preview:</h3>
-            <img
-              src={preview}
-              alt="Selected Preview"
-              style={{
-                maxWidth: "300px",
-                maxHeight: "300px",
-                objectFit: "cover",
-                borderRadius: "8px",
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-              }}
-            />
+            <img src={preview} alt="Selected Preview" className="preview-image" />
           </div>
-        ) : (
-          <p>No image selected</p>
+        )}
+
+        {error && <p className="error-message">{error}</p>}
+
+        <button onClick={handleUpload} className="upload-button">
+          Upload Image
+        </button>
+
+        {uploadStatus && (
+          <p
+            className={`status-message ${
+              uploadStatus === "Upload successful!" ? "status-success" : "status-fail"
+            }`}
+          >
+            {uploadStatus}
+          </p>
+        )}
+
+        {oimage && (
+          <div className="processed-section">
+            <h3>Processed Image:</h3>
+            <img src={oimage} alt="Processed" className="processed-image" />
+          </div>
+        )}
+
+        {count !== null && (
+          <div className="detection-count">
+            <h2>Detection Count: {count}</h2>
+          </div>
         )}
       </div>
 
-      <label htmlFor="imageType" style={{ display: "block", marginTop: "20px" }}>
-        Select Image Type:
-      </label>
-      <select
-        id="imageType"
-        value={imageType}
-        onChange={handleTypeChange}
-        style={{
-          marginTop: "10px",
-          padding: "10px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-          width: "100%",
-          maxWidth: "300px",
-        }}
-      >
-        <option value="">--Select Type--</option>
-        {imageTypes.map((type) => (
-          <option key={type} value={type}>
-            {type.charAt(0).toUpperCase()+type.slice(1)}
-          </option>
-        ))}
-      </select>
-
-      <button
-        onClick={handleUpload}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Upload Image
-      </button>
-
-      {error && <p style={{ marginTop: "20px", color: "red" }}>{error}</p>}
-
-      {uploadStatus && (
-        <p style={{ marginTop: "20px", color: uploadStatus === "Upload successful!" ? "green" : "red" }}>
-          {uploadStatus}
-        </p>
-      )}
-
-      {oimage && (
-        <div>
-          <h3>Processed Image:</h3>
-          <img
-            src={oimage}
-            alt="Processed"
-            style={{
-              maxWidth: "100%",
-              maxHeight: "300px",
-              borderRadius: "8px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            }}
-          />
-        </div>
-      )}
-
-      {count !== null && (
-        <div>
-          <h2>Detection Count: {count}</h2>
-        </div>
-      )}
+      {/* Hidden canvas for capturing image */}
+      <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+      <div id="cameraContainer"></div>
     </div>
   );
 };
