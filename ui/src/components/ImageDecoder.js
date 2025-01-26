@@ -75,25 +75,26 @@ const ImageDecoder = () => {
 
   const startCamera = async () => {
     try {
-      // Clear previous camera container
       const cameraContainer = document.getElementById("cameraContainer");
-      cameraContainer.innerHTML = "";
-
-      // Start a new video stream
+      cameraContainer.innerHTML = ""; // Clear previous camera container
+  
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setVideoStream(stream);
       const videoElement = document.createElement("video");
       videoElement.srcObject = stream;
       videoElement.play();
-      videoElement.width = window.innerWidth > 640 ? 640 : window.innerWidth * 0.9; // 90% of the screen width
-      videoElement.height = videoElement.width * (480 / 640); // Maintain the 4:3 aspect ratio
+  
+      const containerWidth = cameraContainer.clientWidth;
+      const videoWidth = containerWidth * 0.5; // 50% width of the container
+      videoElement.width = videoWidth;
+      videoElement.height = videoWidth * (480 / 640); // Maintain aspect ratio
       videoElement.id = "videoElement";
       setIsCameraActive(true);
-
+  
       // Append video element to the DOM
       cameraContainer.appendChild(videoElement);
-    } catch (err) {
-      setError("Failed to access the camera.");
+    } catch (error) {
+      console.error("An error occurred while accessing the camera:", error);
     }
   };
 
@@ -143,7 +144,7 @@ const ImageDecoder = () => {
     <div className="container">
       <div className="wrapper">
         <label htmlFor="imageType" className="select-type-label">
-          Select Image Type:
+          Select Type of Image:
         </label>
         <select
           id="imageType"
@@ -158,12 +159,16 @@ const ImageDecoder = () => {
             </option>
           ))}
         </select>
-
-        <div className="space-buttons">
+        <label htmlFor="" className="select-type-label">
+          Pick up Image via:
+        </label>
+        
+        <div className="space-buttons1">
+       
           <button onClick={handleCapture} className="capture-button">
             {isCameraActive ? "Capture Image" : "Use Camera to Capture Image"}
           </button>
-          <p>or</p>
+          
           <label htmlFor="fileInput" className="custom-upload-button">
             Upload from Device
           </label>
