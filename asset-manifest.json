@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Saikumarlenka/image-decoder/static/css/main.93cbf857.css",
+    "main.js": "/Saikumarlenka/image-decoder/static/js/main.9d4ba118.js",
+    "index.html": "/Saikumarlenka/image-decoder/index.html",
+    "main.93cbf857.css.map": "/Saikumarlenka/image-decoder/static/css/main.93cbf857.css.map",
+    "main.9d4ba118.js.map": "/Saikumarlenka/image-decoder/static/js/main.9d4ba118.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.93cbf857.css",
+    "static/js/main.9d4ba118.js"
+  ]
+}
