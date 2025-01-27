@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/Saikumarlenka.github.io/image-decoder/static/css/main.93cbf857.css",
-    "main.js": "/Saikumarlenka.github.io/image-decoder/static/js/main.9d4ba118.js",
-    "index.html": "/Saikumarlenka.github.io/image-decoder/index.html",
-    "main.93cbf857.css.map": "/Saikumarlenka.github.io/image-decoder/static/css/main.93cbf857.css.map",
-    "main.9d4ba118.js.map": "/Saikumarlenka.github.io/image-decoder/static/js/main.9d4ba118.js.map"
+    "main.css": "/image-decoder/static/css/main.93cbf857.css",
+    "main.js": "/image-decoder/static/js/main.9d4ba118.js",
+    "index.html": "/image-decoder/index.html",
+    "main.93cbf857.css.map": "/image-decoder/static/css/main.93cbf857.css.map",
+    "main.9d4ba118.js.map": "/image-decoder/static/js/main.9d4ba118.js.map"
   },
   "entrypoints": [
     "static/css/main.93cbf857.css",
