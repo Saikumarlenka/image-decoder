@@ -7,7 +7,7 @@ const ImageDecoder = () => {
   const [preview, setPreview] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [count, setCount] = useState(null);
-  const [oimage, setOimage] = useState(null);
+  const [oimage, setOimage] = useState("https://picsum.photos/seed/picsum/200/300");
   const [imageType, setImageType] = useState("");
   const [error, setError] = useState("");
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -76,6 +76,8 @@ const ImageDecoder = () => {
   const startCamera = async () => {
     try {
       setPreview(null)
+      setImageFile(null)
+      setOimage(null)
       const cameraContainer = document.getElementById("cameraContainer");
       cameraContainer.innerHTML = ""; // Clear previous camera container
   
@@ -181,10 +183,7 @@ const ImageDecoder = () => {
             className="input-file"
             style={{ display: "none" }}
           />
-        </div>
-        {
-          
-        }
+          </div>
         <div id="cameraContainer"></div>
 
         {preview && (
@@ -210,7 +209,7 @@ const ImageDecoder = () => {
           </p>
         )}
 
-        {oimage && isCameraActive==false && (
+        {oimage && isCameraActive===false && (
           <div className="processed-section">
             <h3>Processed Image:</h3>
             <img src={oimage} alt="Processed" className="processed-image" />
