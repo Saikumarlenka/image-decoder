@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import { Modal, Button, notification } from "antd";
 import "./ImageDecoder.css"; // Import the CSS file
 
 const ImageDecoder = () => {
@@ -13,6 +14,8 @@ const ImageDecoder = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [videoStream, setVideoStream] = useState(null);
   const [imageQuality, setImageQuality] = useState(0.5); // Add state for image quality
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFrontCamera, setIsFrontCamera] = useState(true);
   const canvasRef = useRef(null);
 
   const imageTypes = ["wood", "box"];
@@ -44,11 +47,13 @@ const ImageDecoder = () => {
   const handleUpload = async () => {
     if (!imageFile) {
       setError("Image is required.");
+      notification.error({ message: "Image is required." });
       return;
     }
 
     if (!imageType) {
       setError("Image type is required.");
+      notification.error({ message: "Image type is required." });
       return;
     }
 
@@ -71,40 +76,43 @@ const ImageDecoder = () => {
         setUploadStatus("Upload successful!");
         setCount(response.data.count);
         setOimage(response.data.image_path);
+        notification.success({ message: "Upload successful!" });
       } else {
         setUploadStatus("Upload failed.");
+        notification.error({ message: "Upload failed." });
       }
     } catch (error) {
       setUploadStatus("An error occurred while uploading.");
+      notification.error({ message: "An error occurred while uploading." });
     }
   };
 
   const startCamera = async () => {
     try {
-      setPreview(null)
-      setImageFile(null)
-      setOimage(null)
-      setCount(null)
-      const cameraContainer = document.getElementById("cameraContainer");
-      cameraContainer.innerHTML = ""; // Clear previous camera container
-  
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setPreview(null);
+      setImageFile(null);
+      setOimage(null);
+      setCount(null);
+      const constraints = {
+        video: {
+          facingMode: isFrontCamera ? "user" : "environment",
+        },
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setVideoStream(stream);
       const videoElement = document.createElement("video");
       videoElement.srcObject = stream;
       videoElement.play();
-  
-      const containerWidth = cameraContainer.clientWidth;
-      const videoWidth = containerWidth * 0.5; // 50% width of the container
-      videoElement.width = videoWidth;
-      videoElement.height = videoWidth * (480 / 640); // Maintain aspect ratio
       videoElement.id = "videoElement";
       setIsCameraActive(true);
-  
+
       // Append video element to the DOM
+      const cameraContainer = document.getElementById("cameraContainer");
+      cameraContainer.innerHTML = ""; // Clear previous camera container
       cameraContainer.appendChild(videoElement);
     } catch (error) {
       console.error("An error occurred while accessing the camera:", error);
+      notification.error({ message: "An error occurred while accessing the camera." });
     }
   };
 
@@ -126,8 +134,12 @@ const ImageDecoder = () => {
           setImageFile(file);
           setPreview(imageUrl);
           stopCamera(); // Stop the camera after capturing
+          setIsModalVisible(false);
         })
-        .catch(() => setError("Error capturing image."));
+        .catch(() => {
+          setError("Error capturing image.");
+          notification.error({ message: "Error capturing image." });
+        });
     }
   };
 
@@ -143,11 +155,19 @@ const ImageDecoder = () => {
   };
 
   const handleCapture = () => {
-    if (!isCameraActive) {
-      startCamera();
-    } else {
-      captureImage();
-    }
+    setIsModalVisible(true);
+    startCamera();
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    stopCamera();
+  };
+
+  const switchCamera = () => {
+    setIsFrontCamera(!isFrontCamera);
+    stopCamera();
+    startCamera();
   };
 
   return (
@@ -247,7 +267,25 @@ const ImageDecoder = () => {
 
       {/* Hidden canvas for capturing image */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-      
+
+      <Modal
+        title="Camera"
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="switch" onClick={switchCamera}>
+            Switch Camera
+          </Button>,
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="capture" type="primary" onClick={captureImage}>
+            Capture
+          </Button>,
+        ]}
+      >
+        <div id="cameraContainer"></div>
+      </Modal>
     </div>
   );
 };
