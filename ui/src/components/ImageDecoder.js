@@ -12,6 +12,7 @@ const ImageDecoder = () => {
   const [error, setError] = useState("");
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [videoStream, setVideoStream] = useState(null);
+  const [imageQuality, setImageQuality] = useState(0.5); // Add state for image quality
   const canvasRef = useRef(null);
 
   const imageTypes = ["wood", "box"];
@@ -36,6 +37,10 @@ const ImageDecoder = () => {
     setError("");
   };
 
+  const handleQualityChange = (event) => {
+    setImageQuality(event.target.value);
+  };
+
   const handleUpload = async () => {
     if (!imageFile) {
       setError("Image is required.");
@@ -50,6 +55,7 @@ const ImageDecoder = () => {
     const formData = new FormData();
     formData.append("image", imageFile);
     formData.append("type", imageType);
+    formData.append("confidence_threshold", imageQuality); // Append image quality to form data
 
     try {
       setUploadStatus("Uploading...");
@@ -193,6 +199,21 @@ const ImageDecoder = () => {
             <img src={preview} alt="Selected Preview" className="preview-image" />
           </div>
         )}
+
+        <label htmlFor="imageQuality" className="select-type-label">
+          Select Image Quality:
+        </label>
+        <input
+          type="range"
+          id="imageQuality"
+          min="0.5"
+          max="1"
+          step="0.1"
+          value={imageQuality}
+          onChange={handleQualityChange}
+          className="quality-slider"
+        />
+        <span>{imageQuality}</span>
 
         {error && <p className="error-message">{error}</p>}
 
