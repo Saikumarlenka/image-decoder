@@ -75,6 +75,7 @@ const ImageDecoder = () => {
 
   const startCamera = async () => {
     try {
+      setPreview(null)
       const cameraContainer = document.getElementById("cameraContainer");
       cameraContainer.innerHTML = ""; // Clear previous camera container
   
@@ -181,6 +182,10 @@ const ImageDecoder = () => {
             style={{ display: "none" }}
           />
         </div>
+        {
+          
+        }
+        <div id="cameraContainer"></div>
 
         {preview && (
           <div className="preview-section">
@@ -205,7 +210,7 @@ const ImageDecoder = () => {
           </p>
         )}
 
-        {oimage && (
+        {oimage && isCameraActive==false && (
           <div className="processed-section">
             <h3>Processed Image:</h3>
             <img src={oimage} alt="Processed" className="processed-image" />
@@ -221,7 +226,7 @@ const ImageDecoder = () => {
 
       {/* Hidden canvas for capturing image */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-      <div id="cameraContainer"></div>
+      
     </div>
   );
 };

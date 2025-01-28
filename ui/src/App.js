@@ -1,5 +1,5 @@
 import './App.css';
-import ImageDecoder from './components/ImageDecoder1';
+import ImageDecoder from './components/ImageDecoder';
 
 function App() {
   return (
