@@ -21,6 +21,8 @@ const ImageDecoder = () => {
   const imageTypes = ["wood", "box"];
 
   const handleFileChange = (event) => {
+    console.log("clicked");
+    
     const file = event.target.files[0];
     if (file && file.type.startsWith("image/")) {
       setImageFile(file);
@@ -195,11 +197,11 @@ const ImageDecoder = () => {
           </label>
           <div className="space-buttons1">
             <button onClick={handleCapture} className="capture-button">
-              {isCameraActive ? "Capture Image" : "Use Camera to Capture Image"}
+              {isCameraActive ? "Capture Image" : "Use Camera to Capture"}
             </button>
-            <button htmlFor="fileInput" className="custom-upload-button">
+            <label htmlFor="fileInput" className="custom-upload-button common-button">
               Upload from Device
-            </button>
+            </label>
             <input
               type="file"
               id="fileInput"
@@ -219,7 +221,7 @@ const ImageDecoder = () => {
           </div>
         )}
 
-        <div className="form-group">
+        <div className="input-items">
           <label htmlFor="imageQuality" className="select-type-label">
             Select Image Quality:
           </label>
@@ -233,7 +235,7 @@ const ImageDecoder = () => {
             onChange={handleQualityChange}
             className="quality-slider"
           />
-          <span>{imageQuality}</span>
+          <span style={{marginRight:'70px'}}>{imageQuality}</span>
         </div>
 
         {error && <p className="error-message">{error}</p>}
