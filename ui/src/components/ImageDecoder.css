@@ -67,12 +67,28 @@
   max-width: 28rem;
   border: 1px solid gray;
   border-radius: 0.5rem;
-  padding: 20px;
+  padding: 10px;
   /* box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1); */
   /* transition: box-shadow 0.3s ease-in-out; */
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.input-items {
+  display: flex;
+  flex-direction: row;
+}
+
+/* .select-type-label {
+  width: fit-content; Adjust as needed */
+
+
+.inline-block {
+  display: inline-block;
+}
+
+.ml-2 {
+  margin-left: 2px; /* Adjust spacing as needed */
 }
 
 /* Optional hover effect */
@@ -81,11 +97,11 @@
 }
 
 /* Buttons for file upload and camera */
-.custom-upload-button,
-.capture-button,
-.upload-button {
+.custom-upload-button
+
+ {
   width: 100%;
-  padding: 10px;
+ 
   background-color: #34d399;
   color: white;
   border-radius: 0.375rem;

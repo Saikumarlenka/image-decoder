@@ -61,11 +61,15 @@ const ImageDecoder = () => {
       setUploadStatus("Uploading...");
       setError("");
 
-      const response = await axios.post("http://127.0.0.1:8000/image-scan/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://127.0.0.1:8000/image-scan/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.status === 200) {
         setUploadStatus("Upload successful!");
@@ -81,26 +85,26 @@ const ImageDecoder = () => {
 
   const startCamera = async () => {
     try {
-      setPreview(null)
-      setImageFile(null)
-      setOimage(null)
-      setCount(null)
+      setPreview(null);
+      setImageFile(null);
+      setOimage(null);
+      setCount(null);
       const cameraContainer = document.getElementById("cameraContainer");
       cameraContainer.innerHTML = ""; // Clear previous camera container
-  
+
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setVideoStream(stream);
       const videoElement = document.createElement("video");
       videoElement.srcObject = stream;
       videoElement.play();
-  
+
       const containerWidth = cameraContainer.clientWidth;
       const videoWidth = containerWidth * 0.5; // 50% width of the container
       videoElement.width = videoWidth;
       videoElement.height = videoWidth * (480 / 640); // Maintain aspect ratio
       videoElement.id = "videoElement";
       setIsCameraActive(true);
-  
+
       // Append video element to the DOM
       cameraContainer.appendChild(videoElement);
     } catch (error) {
@@ -122,7 +126,9 @@ const ImageDecoder = () => {
       fetch(imageUrl)
         .then((res) => res.blob())
         .then((blob) => {
-          const file = new File([blob], "captured_image.png", { type: "image/png" });
+          const file = new File([blob], "captured_image.png", {
+            type: "image/png",
+          });
           setImageFile(file);
           setPreview(imageUrl);
           stopCamera(); // Stop the camera after capturing
@@ -153,32 +159,34 @@ const ImageDecoder = () => {
   return (
     <div className="container">
       <div className="wrapper">
-        <label htmlFor="imageType" className="select-type-label">
-          Select Type of Image:
-        </label>
-        <select
-          id="imageType"
-          value={imageType}
-          onChange={handleTypeChange}
-          className="select-type"
-        >
-          <option value="">--Select Type--</option>
-          {imageTypes.map((type) => (
-            <option key={type} value={type}>
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </option>
-          ))}
-        </select>
+        <div className="input-items">
+          <label htmlFor="imageType" className="select-type-label inline-block">
+            Select Type of Image:
+          </label>
+          <select
+            id="imageType"
+            value={imageType}
+            onChange={handleTypeChange}
+            className="select-type inline-block ml-2"
+          >
+            <option value="">--Select Type--</option>
+            {imageTypes.map((type) => (
+              <option key={type} value={type}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <label htmlFor="" className="select-type-label">
           Pick up Image via:
         </label>
-        
+
         <div className="space-buttons1">
-       
           <button onClick={handleCapture} className="capture-button">
             {isCameraActive ? "Capture Image" : "Use Camera to Capture Image"}
           </button>
-          
+
           <label htmlFor="fileInput" className="custom-upload-button">
             Upload from Device
           </label>
@@ -190,13 +198,17 @@ const ImageDecoder = () => {
             className="input-file"
             style={{ display: "none" }}
           />
-          </div>
+        </div>
         <div id="cameraContainer"></div>
 
         {preview && (
           <div className="preview-section">
             <h3>Preview:</h3>
-            <img src={preview} alt="Selected Preview" className="preview-image" />
+            <img
+              src={preview}
+              alt="Selected Preview"
+              className="preview-image"
+            />
           </div>
         )}
 
@@ -224,14 +236,16 @@ const ImageDecoder = () => {
         {uploadStatus && (
           <p
             className={`status-message ${
-              uploadStatus === "Upload successful!" ? "status-success" : "status-fail"
+              uploadStatus === "Upload successful!"
+                ? "status-success"
+                : "status-fail"
             }`}
           >
             {uploadStatus}
           </p>
         )}
 
-        {oimage && isCameraActive===false && (
+        {oimage && isCameraActive === false && (
           <div className="processed-section">
             <h3>Processed Image:</h3>
             <img src={oimage} alt="Processed" className="processed-image" />
@@ -247,7 +261,6 @@ const ImageDecoder = () => {
 
       {/* Hidden canvas for capturing image */}
       <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-      
     </div>
   );
 };
